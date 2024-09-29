@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API SMS Sender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #loading {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #007bff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #error {
+            color: red;
+        }
+
+        #success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send SMS via API</h1>
+        <form id="smsForm">
+            <label for="phoneNumber">Enter Phone Number:</label>
+            <input type="text" id="phoneNumber" placeholder="Enter your number" required>
+            
+            <label for="message">Write Message:</label>
+            <textarea id="message" placeholder="Enter your message" required></textarea>
+            
+            <button type="submit" id="sendBtn">Send SMS</button>
+        </form>
+        
+        <div id="loading" class="hidden">Loading...</div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById("smsForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const phoneNumber = document.getElementById("phoneNumber").value;
+            const message = document.getElementById("message").value;
+            const loadingElement = document.getElementById("loading");
+            const resultElement = document.getElementById("result");
+
+            // Show loading animation
+            loadingElement.classList.remove("hidden");
+            resultElement.innerHTML = "";
+
+            // API call
+            fetch("https://badhan-api.stylezworld.net/api/otp/store", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "user-agent": "Dart/3.1 (dart:io)",
+                    "app-access-token": "mWR+64IbKwxM2XCyJbMvUSCcc=",
+                    "accept": "application/json"
+                },
+                body: JSON.stringify({
+                    "phone_number": phoneNumber,
+                    "registration_phone_number": phoneNumber,
+                    "auto_fill": message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingElement.classList.add("hidden");
+                if (data.success) {
+                    resultElement.innerHTML = `<p id="success">SMS sent successfully: ${JSON.stringify(data)}</p>`;
+                } else {
+                    resultElement.innerHTML = `<p id="error">Failed to send SMS: ${JSON.stringify(data)}</p>`;
+                }
+            })
+            .catch(error => {
+                loadingElement.classList.add("hidden");
+                resultElement.innerHTML = `<p id="error">Error: ${error.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
